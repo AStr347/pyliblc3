@@ -1,8 +1,9 @@
 from ctypes import *
+from sys import platform
 
-__ILC3_OK = 0
-__ILC3_BAD_ARG = -1
-__ILC3_BAD_INOUT = -2
+_ILC3_OK = 0
+_ILC3_BAD_ARG = -1
+_ILC3_BAD_INOUT = -2
 
 
 class ilc3_coderStruct(Structure):
@@ -36,9 +37,20 @@ class LC3:
 
     def __init__(self) -> None:
         # load shared lib
-        so = cdll.LoadLibrary("liblc3.so", winmode=0)
-        self.__so = so
         
+        if platform == "linux" or platform == "linux2":
+            # linux
+            so = cdll.LoadLibrary("liblc3.so")
+        elif platform == "darwin":
+            so = cdll.LoadLibrary("liblc3.dylib")
+        elif platform == "win32":
+            # Windows
+            try:
+                so = cdll.LoadLibrary("liblc3.dll")
+            except:
+                so = cdll.LoadLibrary("liblc3.so", winmode=0)
+
+        self.__so = so
         # init lc3 coder params
         self.__coder_init(16000, 16, 48000, 2)
 
@@ -50,7 +62,7 @@ class LC3:
         dst_cstr = dst_path.encode('utf-8') + b'\0'
         p_coder = pointer(self.__coder)
         res = self.__so.file_wav_to_lc3(p_coder, src_cstr, dst_cstr)
-        return (__ILC3_OK == res)
+        return (_ILC3_OK == res)
 
     def Flc3_to_wav(self, src_path: str, dst_path: str) -> bool:
         '''
@@ -60,7 +72,7 @@ class LC3:
         dst_cstr = dst_path.encode('utf-8') + b'\0'
         p_coder = pointer(self.__coder)
         res = self.__so.file_lc3_to_wav(p_coder, src_cstr, dst_cstr)
-        return (__ILC3_OK == res)
+        return (_ILC3_OK == res)
 
     def Swav_to_lc3(self, instream: bytearray) -> bool | bytearray:
         '''
@@ -78,7 +90,7 @@ class LC3:
                                          outstream,
                                          in_siz,
                                          False)
-        if(__ILC3_OK > encres):
+        if(_ILC3_OK > encres):
             return False
         
         # read needed size of any type buffer
@@ -105,7 +117,7 @@ class LC3:
                                          outstream,
                                          out_siz)
         
-        if(__ILC3_OK > decres):
+        if(_ILC3_OK > decres):
             return False
 
         # read needed size of any type buffer
