@@ -40,15 +40,15 @@ class LC3:
         
         if platform == "linux" or platform == "linux2":
             # linux
-            so = cdll.LoadLibrary("liblc3.so")
+            so = CDLL("liblc3.so")
         elif platform == "darwin":
-            so = cdll.LoadLibrary("liblc3.dylib")
+            so = CDLL("liblc3.dylib")
         elif platform == "win32":
             # Windows
             try:
-                so = cdll.LoadLibrary("liblc3.dll")
+                so = CDLL("liblc3.dll")
             except:
-                so = cdll.LoadLibrary("liblc3.so", winmode=0)
+                so = CDLL("liblc3.so", winmode=0)
 
         self.__so = so
         # init lc3 coder params
