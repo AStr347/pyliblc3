@@ -36,7 +36,7 @@ class LC3:
 
     def __init__(self) -> None:
         # load shared lib
-        so = cdll.LoadLibrary("liblc3.so")
+        so = cdll.LoadLibrary("liblc3.so", winmode=0)
         self.__so = so
         
         # init lc3 coder params
